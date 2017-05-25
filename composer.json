@@ -9,7 +9,6 @@
             "email": "ben@thatmustbe.me"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "indieauth/client": "^0.2.0"
     }
