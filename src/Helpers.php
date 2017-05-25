@@ -1,5 +1,7 @@
 <?php
 namespace Inklings\IndieAuth;
+
+require_once base_path('vendor/indieauth/client/src/IndieAuth/Client.php');
  
 use Illuminate\Support\HtmlString;
 use Illuminate\Http\Request;
@@ -35,7 +37,7 @@ class Helpers
 
     public static function is_user($url)
     {
-        $url = IndieAuth\Client::normalizeMeURL($url);
+        $url = \IndieAuth\Client::normalizeMeURL($url);
 
         $logged_in_user = session('indieauthclient_me');
 

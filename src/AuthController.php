@@ -1,6 +1,8 @@
 <?php
 namespace Inklings\IndieAuth;
 
+require_once base_path('vendor/indieauth/client/src/IndieAuth/Client.php');
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\HtmlString;
@@ -17,16 +19,16 @@ class AuthController extends Controller
         if(empty($me)){
             return redirect($after_redir)->with('error', 'No URL entered');
         } else {
-            $me = IndieAuth\Client::normalizeMeURL($me);
+            $me = \IndieAuth\Client::normalizeMeURL($me);
             //TODO requie indieauth
-            $auth_endpoint = IndieAuth\Client::discoverAuthorizationEndpoint($me);
+            $auth_endpoint = \IndieAuth\Client::discoverAuthorizationEndpoint($me);
             if (!$auth_endpoint) {
                 return redirect($after_redir)->with('error', 'No Auth Endpoint Found');
             } else {
-                $redir_url = 'indieauth_login/complete'. ($after_redir ? '?r=' . $after_redir : '');
+                $redir_url = config('app.url') . '/indieauth_login/complete'. ($after_redir ? '?r=' . $after_redir : '');
                 if (!empty($scope)) {
                     // if a scope is given we are actually looking to get a token
-                    $redir_url = 'indieauth_login/token'. ($after_redir ? '?r=' . $after_redir : '');
+                    $redir_url = config('app.url') . '/indieauth_login/token'. ($after_redir ? '?r=' . $after_redir : '');
                 }
 
                 //build our get request
@@ -35,8 +37,8 @@ class AuthController extends Controller
                     'me' => $me,
                     'redirect_uri' => $redir_url,
                     'response_type' => 'id',
-                    'state' => substr(md5($trimmed_me . APP_URL ), 0, 8),
-                    'client_id' => APP_URL
+                    'state' => substr(md5($trimmed_me . config('app.url') ), 0, 8),
+                    'client_id' => config('app.url')
                 );
                 //$this->log->write(print_r($data_array,true));
                 if (!empty($scope)) {
@@ -55,12 +57,12 @@ class AuthController extends Controller
     {
 
         // where we are going after we process
-        $after_redir = APP_URL .  $request->input('r') ?: '/';
+        $after_redir = config('app.url') .  $request->input('r') ?: '/';
 
         //recalculate the callback url
-        $redir_url = 'indieauth_login/complete'. ($request->input('r') ? 'r=' . $request->input('r') : '');
+        $redir_url = config('app.url') . '/indieauth_login/complete'. ($request->input('r') ? '?r=' . $request->input('r') : '');
 
-        $me = IndieAuth\Client::normalizeMeURL($request->input('me'));
+        $me = \IndieAuth\Client::normalizeMeURL($request->input('me'));
         $code = $request->input('code');
         $state = $request->input('state');
 
@@ -81,12 +83,12 @@ class AuthController extends Controller
     public function token(Request $request)
     {
         // where we are going after we process
-        $after_redir = APP_URL .  $request->input('r') ?: '/';
+        $after_redir = config('app.url') .  $request->input('r') ?: '/';
 
         //recalculate the callback url
-        $redir_url = 'indieauth_login/token'. ($request->input('r') ? 'r=' . $request->input('r') : '');
+        $redir_url = config('app.url') . '/indieauth_login/token'. ($request->input('r') ? '?r=' . $request->input('r') : '');
 
-        $me = IndieAuth\Client::normalizeMeURL($request->input('me'));
+        $me = \IndieAuth\Client::normalizeMeURL($request->input('me'));
         $code = $request->input('code');
         $state = $request->input('state');
 
@@ -121,10 +123,10 @@ class AuthController extends Controller
     private function confirmAuth($me, $code, $redir, $state = null)
     {
 
-        $client_id = APP_URL;
+        $client_id = config('app.url');
 
         //look up user's auth provider
-        $auth_endpoint = IndieAuth\Client::discoverAuthorizationEndpoint($me);
+        $auth_endpoint = \IndieAuth\Client::discoverAuthorizationEndpoint($me);
 
         $post_array = array(
             'code'          => $code,
@@ -135,6 +137,7 @@ class AuthController extends Controller
             $post_array['state'] = $state;
         }
 
+        //Log::debug(print_r($post_array, true));
         $post_data = http_build_query($post_array);
         //$this->log->write('post_data: '.print_r($post_array,true));
         //$this->log->write('endpoint: '.$auth_endpoint);
@@ -153,10 +156,12 @@ class AuthController extends Controller
 
         $results = array();
         parse_str($response, $results);
-        //$this->log->write('endpoint_response: '.$response);
-        //$this->log->write(print_r($results, true));
+        if(isset($results['error'])){
+            Log::debug(print_r($results, true));
+        }
 
-        $results['me'] = $this->normalizeUrl($results['me']);
+
+        $results['me'] = \IndieAuth\Client::normalizeMeURL($results['me']);
 
         $trimmed_me = trim($me, '/');
         $trimmed_result_me = trim($results['me'], '/');
@@ -175,10 +180,10 @@ class AuthController extends Controller
     private function getToken($me, $code, $redir, $state = null)
     {
 
-        $client_id = APP_URL;
+        $client_id = config('app.url');
 
         //look up user's token provider
-        $token_endpoint = IndieAuth\Client::discoverTokenEndpoint($me);
+        $token_endpoint = \IndieAuth\Client::discoverTokenEndpoint($me);
 
 
         $post_array = array(

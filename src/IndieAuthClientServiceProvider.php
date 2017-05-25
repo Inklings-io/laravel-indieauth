@@ -1,5 +1,4 @@
 <?php
-
 namespace Inklings\IndieAuth;
 
 use Illuminate\Support\ServiceProvider;
