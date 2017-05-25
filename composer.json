@@ -1,6 +1,6 @@
 {
     "name": "inklings.io/laravel-indieauth-client",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Laravel package for indieauth based authentication",
     "license": ["MIT","CC0-1.0"],
     "authors": [
@@ -9,6 +9,11 @@
             "email": "ben@thatmustbe.me"
         }
     ],
+    "autoload": {
+        "psr-4": [
+            "IndieAuth\\Client\\": "src/"
+        ]
+    },
     "require": {
         "indieauth/client": "^0.2.0"
     }
