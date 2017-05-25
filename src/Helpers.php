@@ -35,11 +35,7 @@ class Helpers
 
     public static function is_user($url)
     {
-        //TODO improve this
-        $url = trim($url);
-        if (strpos($url, 'http') !== 0) {
-            $url = 'http://' . $url;
-        }
+        $url = IndieAuth\Client::normalizeMeURL($url);
 
         $logged_in_user = session('indieauthclient_me');
 

@@ -1,7 +1,8 @@
 {
     "name": "inklings.io/laravel-indieauth-client",
+    "version": "0.1.0",
     "description": "Laravel package for indieauth based authentication",
-    "license": "MIT, CC0",
+    "license": ["MIT","CC0-1.0"],
     "authors": [
         {
             "name": "Ben Roberts",

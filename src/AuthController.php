@@ -17,7 +17,7 @@ class AuthController extends Controller
         if(empty($me)){
             return redirect($after_redir)->with('error', 'No URL entered');
         } else {
-            $me = $this->standardize($me);
+            $me = IndieAuth\Client::normalizeMeURL($me);
             //TODO requie indieauth
             $auth_endpoint = IndieAuth\Client::discoverAuthorizationEndpoint($me);
             if (!$auth_endpoint) {
@@ -60,7 +60,7 @@ class AuthController extends Controller
         //recalculate the callback url
         $redir_url = 'indieauth_login/complete'. ($request->input('r') ? 'r=' . $request->input('r') : '');
 
-        $me = $this->standardize($request->input('me'));
+        $me = IndieAuth\Client::normalizeMeURL($request->input('me'));
         $code = $request->input('code');
         $state = $request->input('state');
 
@@ -86,7 +86,7 @@ class AuthController extends Controller
         //recalculate the callback url
         $redir_url = 'indieauth_login/token'. ($request->input('r') ? 'r=' . $request->input('r') : '');
 
-        $me = $this->standardize($request->input('me'));
+        $me = IndieAuth\Client::normalizeMeURL($request->input('me'));
         $code = $request->input('code');
         $state = $request->input('state');
 
@@ -117,15 +117,6 @@ class AuthController extends Controller
         
     }
 
-    private function standardize($url)
-    {
-        //TODO: improve this
-        $url = trim($url);
-        if (strpos($url, 'http') !== 0) {
-            $url = 'http://' . $url;
-        }
-        echo $url;
-    }
 
     private function confirmAuth($me, $code, $redir, $state = null)
     {
