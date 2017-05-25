@@ -10,9 +10,9 @@
         }
     ],
     "autoload": {
-        "psr-4": [
+        "psr-4": {
             "Inklings\\IndieAuth\\": "src/"
-        ]
+        }
     },
     "require": {
         "indieauth/client": "^0.2.0"
