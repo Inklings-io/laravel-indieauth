@@ -57,7 +57,7 @@ class AuthController extends Controller
     {
 
         // where we are going after we process
-        $after_redir = config('app.url') .  $request->input('r') ?: '/';
+        $after_redir = config('app.url') . '/' . $request->input('r') ?: '/';
 
         //recalculate the callback url
         $redir_url = config('app.url') . '/indieauth_login/complete'. ($request->input('r') ? '?r=' . $request->input('r') : '');
@@ -83,7 +83,7 @@ class AuthController extends Controller
     public function token(Request $request)
     {
         // where we are going after we process
-        $after_redir = config('app.url') .  $request->input('r') ?: '/';
+        $after_redir = config('app.url') . '/' . $request->input('r') ?: '/';
 
         //recalculate the callback url
         $redir_url = config('app.url') . '/indieauth_login/token'. ($request->input('r') ? '?r=' . $request->input('r') : '');
